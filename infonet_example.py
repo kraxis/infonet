@@ -19,8 +19,7 @@
 #       -infonet_save.saveData() computes empiricals and scorefunc over 1000
 #           examples of each class and stores a 500-size test fold
 #       -infonet_save.loadData() takes class names and num examples
-#git test
-
+#  git test
 
 import infonet_fin as repo
 import pgm as pgm

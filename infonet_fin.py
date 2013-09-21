@@ -8,7 +8,7 @@ from scipy.linalg import *
 from scipy import ndimage
 from scipy import stats
 
-################################ data ##############################################
+################################  data ##############################################
 def readCsv(filepath):
     f=open(filepath,'r')
     content=f.readlines()

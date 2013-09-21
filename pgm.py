@@ -8,4 +8,4 @@ from scipy.linalg import *
 from scipy import ndimage
 from scipy import stats
 
-############################ template stuff ###########################
+############################  template stuff ###########################
