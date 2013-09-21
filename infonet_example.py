@@ -27,7 +27,7 @@ import infonet_save as saver
 from numpy import *
 import math
 
-nums=['8','9']
+nums=['1','2']
 lendata=100
 res=4
 numClasses=9 #classes over which empiricals were computed/saved
