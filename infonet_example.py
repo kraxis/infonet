@@ -25,10 +25,11 @@ import infonet_fin as repo
 import pgm as pgm
 import infonet_save as saver
 from numpy import *
+import matplotlib.pyplot as plt
 import math
 
-nums=['1','2']
-lendata=100
+nums=['8','9']
+lendata=200
 res=4
 numClasses=9 #classes over which empiricals were computed/saved
 
@@ -36,6 +37,10 @@ load=['testX','testY','pX','pY','pXX','pYY','w','f','adj']
 loaded=repo.loadData('infonet_vars.db',nums,lendata,numClasses,load)
 X,Y,pX,pY,pXX,pYY,w,f,adj=loaded
 
+sc=[repo.indScoreVec(pX,pY,Y,w,res,2)]
+repo.showplot(sc,nums)
+
+'''
 propscores=pgm.propscore(loaded,600)
         
 print 'propscored'
@@ -45,3 +50,4 @@ sc=[repo.indScore(pX,pY,Y,w,res),repo.corScore(Y,f,adj),
 print 'scored imgs'
 
 repo.showplot(sc,nums,X=X,Y=Y)
+'''

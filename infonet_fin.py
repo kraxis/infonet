@@ -115,6 +115,28 @@ def pairDist(data,res=16):
             
 
 ######################################## scoring ###############################
+def indScoreVec(pX,pY,Y,w,res,numfeatures):
+    sc=zeros([len(Y),len(Y[0]),numfeatures])
+    JY=zeros([res,res])
+
+    f=[None for _ in range(len(Y[0]))]
+    for x1 in range(len(Y[0])):
+        ymat=eye(res)*(1/array([max(e,0.001) for e in sqrt(pY[x1])]))
+        xmat=eye(res)*sqrt(pX[x1])
+        rmv=dot(transpose(sqrt(array([pY[x1]]))),sqrt(array([pX[x1]])))
+        
+        B=dot(ymat,dot(w,xmat)) - rmv
+        u,s,v=svd(B)
+        for i in range(res):
+            for chi in range(res):
+                JY[i,chi]=u[chi,i]
+        f[x1]=[JY[feat,:]/array([max(e,0.001) for e in pY[x1,:]]) for feat in range(numfeatures)]
+    for img in range(len(Y)):
+        for x1 in range(len(Y[0])):
+            sc[img,x1]=[f[x1][feat][Y[img,x1]] for feat in range(numfeatures)]
+    sc=sum(sc,1)
+    return sc
+
 def indScore(pX,pY,Y,w,res):
     sc=zeros(shape(Y))
     JY=zeros([res,res])
@@ -389,56 +411,76 @@ def mutInfo(X,pX,pY,w,res):
     return minf
 
 ################################# plotting #######################################
-def showplot(scores,nums,showpics=False,X=None,Y=None):
-    if showpics:
-        lendata=int(len(scores[0])/len(nums))
-        size=int(math.sqrt(len(X[0])))
-        n=len(X)
-        numY=int(sqrt(n))
-        while(n%numY!=0):
-            numY-=1
-        numX=n/numY
-        plt.figure(1)
-        ind=[i[0] for i in sorted(enumerate(scores), key=lambda x:x[1])]
-        imgs=[None for _ in range(numY*numX)]
-        print 'getting pics... ('+repr(lendata)+' examples)'
-        for i in range(numY):
-            for j in range(numX):
-                pltnum=numX*i+j+1
-                imgs[pltnum-1]=plt.subplot(numY,numX,pltnum)
-                imgs[pltnum-1].axes.get_xaxis().set_visible(False)
-                imgs[pltnum-1].axes.get_yaxis().set_visible(False)
-                imgs[pltnum-1].imshow(reshape(Y[ind[pltnum-1]],(size,size)),
-                                      interpolation='none',cmap = cm.Greys_r)
-
-        plt.figure(2)
-        imgs=[None for _ in range(numY*numX)]
-        for i in range(numY):
-            for j in range(numX):
-                pltnum=numX*i+j+1
-                imgs[pltnum-1]=plt.subplot(numY,numX,pltnum)
-                imgs[pltnum-1].axes.get_xaxis().set_visible(False)
-                imgs[pltnum-1].axes.get_yaxis().set_visible(False)
-                imgs[pltnum-1].imshow(reshape(X[ind[pltnum-1]],(size,size)),
-                                      interpolation='none',cmap = cm.Greys_r)
-        scatnum=3
-    else:
-        scatnum=1
+def arrSubplots(n):
+    numY=int(sqrt(n))
+    while(n%numY!=0):
+        numY-=1
+    numX=n/numY
+    return numX,numY
     
-    plt.figure(scatnum)
-    titles=['unadjusted','NN adjusted','largest NN','propagated NN']
-    pltcolors=['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#FF1493','#8F00FF',\
-               'k','w']
-    lendata=int(len(scores[0])/len(nums))
+def showplot(scores,nums,showpics=False,X=None,Y=None):
+    if len(shape(scores))==2:
+        if showpics:
+            lendata=int(len(scores[0])/len(nums))
+            size=int(math.sqrt(len(X[0])))
+            numX,numY=arrSubplots(len(X))
+            
+            plt.figure(1)
+            ind=[i[0] for i in sorted(enumerate(scores), key=lambda x:x[1])]
+            imgs=[None for _ in range(numY*numX)]
+            print 'getting pics... ('+repr(lendata)+' examples)'
+            for i in range(numY):
+                for j in range(numX):
+                    pltnum=numX*i+j+1
+                    imgs[pltnum-1]=plt.subplot(numY,numX,pltnum)
+                    imgs[pltnum-1].axes.get_xaxis().set_visible(False)
+                    imgs[pltnum-1].axes.get_yaxis().set_visible(False)
+                    imgs[pltnum-1].imshow(reshape(Y[ind[pltnum-1]],(size,size)),
+                                          interpolation='none',cmap = cm.Greys_r)
 
-    for ind in range(len(scores)):
-        temp=[None for _ in range(len(nums))]
-        ptemp=plt.subplot(len(scores),1,ind+1)
-        for n in range(len(nums)):
-            temp[n]=plt.scatter([scores[ind][i] for i in range(n*lendata,(n+1)*lendata)],
-                        [n+1 for _ in range(n*lendata,(n+1)*lendata)],c=pltcolors[n])
-            temp[n].axes.get_yaxis().set_visible(False)
-        ptemp.set_title(titles[ind])
-        plt.legend(temp,nums)
+            plt.figure(2)
+            imgs=[None for _ in range(numY*numX)]
+            for i in range(numY):
+                for j in range(numX):
+                    pltnum=numX*i+j+1
+                    imgs[pltnum-1]=plt.subplot(numY,numX,pltnum)
+                    imgs[pltnum-1].axes.get_xaxis().set_visible(False)
+                    imgs[pltnum-1].axes.get_yaxis().set_visible(False)
+                    imgs[pltnum-1].imshow(reshape(X[ind[pltnum-1]],(size,size)),
+                                          interpolation='none',cmap = cm.Greys_r)
+            scatnum=3
+        else:
+            scatnum=1
+        
+        plt.figure(scatnum)
+        titles=['unadjusted','NN adjusted','largest NN','propagated NN']
+        pltcolors=['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#FF1493','#8F00FF',\
+                   'k','w']
+        lendata=int(len(scores[0])/len(nums))
+
+        for ind in range(len(scores)):
+            temp=[None for _ in range(len(nums))]
+            ptemp=plt.subplot(len(scores),1,ind+1)
+            for n in range(len(nums)):
+                temp[n]=plt.scatter([scores[ind][i] for i in range(n*lendata,(n+1)*lendata)],
+                            [n+1 for _ in range(n*lendata,(n+1)*lendata)],c=pltcolors[n])
+                temp[n].axes.get_yaxis().set_visible(False)
+            ptemp.set_title(titles[ind])
+            plt.legend(temp,nums)
+    else:
+        plt.figure(1)
+        titles=['unadjusted','NN adjusted','largest NN','propagated NN']
+        pltcolors=['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#FF1493','#8F00FF',\
+                   'k','w']
+        lendata=int(len(scores[0])/len(nums))
+        numX,numY=arrSubplots(len(scores))
+        for ind in range(len(scores)):
+            temp=[None for _ in range(len(nums))]
+            ptemp=plt.subplot(numY,numX,ind+1)
+            for n in range(len(nums)):
+                temp[n]=plt.scatter([scores[ind][i,0] for i in range(n*lendata,(n+1)*lendata)],
+                            [scores[ind][i,1] for i in range(n*lendata,(n+1)*lendata)],c=pltcolors[n])
+            ptemp.set_title(titles[ind])
+            plt.legend(temp,nums)
     plt.show()
 
