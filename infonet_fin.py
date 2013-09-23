@@ -255,7 +255,7 @@ def largeScore(Y,f,adj):
         for x1 in range(len(Y[0])):
             sc[img,x1]=f[x1,Y[img,x1]]
             scadj=[adj[x1][n][Y[img,x1],Y[img,nb[x1][n]]] for n in range(len(nb[x1]))]
-            sc[img,x1]+=sum(scadj)
+            sc[img,x1]+=max(scadj)
     sc=sum(sc,1)
     return sc
 

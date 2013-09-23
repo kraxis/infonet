@@ -7,7 +7,7 @@
 #       -each .txt file is structured as: row-example,column-feature
 #       -user specifies a list of filenames to infonet_save.getData()
 #       -getData() returns a single (totExamples x featureLen) numpy array
-#           which contains data from all specified files in concatenated form
+#           which contains data from all specified files in concatenated form (non-permuted)
 #   computation:
 #       -infonet_fin.pairDist() is non-redundant (transpose dist[j,i] if [i,j]
 #           not in dist)
@@ -28,8 +28,8 @@ from numpy import *
 import matplotlib.pyplot as plt
 import math
 
-nums=['8','9']
-lendata=200
+nums=['1','2']
+lendata=100
 res=4
 numClasses=9 #classes over which empiricals were computed/saved
 
@@ -37,11 +37,15 @@ load=['testX','testY','pX','pY','pXX','pYY','w','f','adj']
 loaded=repo.loadData('infonet_vars.db',nums,lendata,numClasses,load)
 X,Y,pX,pY,pXX,pYY,w,f,adj=loaded
 
-sc=[repo.indScoreVec(pX,pY,Y,w,res,2)]
-repo.showplot(sc,nums)
+sc=repo.indScoreVec(pX,pY,Y,w,res,2)
+targ=[0 for _ in range(lendata)]; targ.extend([1 for _ in range(lendata)])
+pgm.svmplot(sc,array(targ))
+#repo.showplot(sc,nums)
+
+
 
 '''
-propscores=pgm.propscore(loaded,600)
+propscores=pgm.propscore(loaded,500)
         
 print 'propscored'
 sc=[repo.indScore(pX,pY,Y,w,res),repo.corScore(Y,f,adj),
