@@ -38,10 +38,10 @@ loaded=repo.loadData('infonet_vars.db',nums,lendata,numClasses,load)
 X,Y,pX,pY,pXX,pYY,w,f,adj=loaded
 
 sc=repo.indScoreVec(pX,pY,Y,w,res,2)
-targ=[0 for _ in range(lendata)]; targ.extend([1 for _ in range(lendata)])
-pgm.svmplot(sc,array(targ))
+sc+=abs(sc.min())
+sc/=100
+pgm.svmplot(sc,nums)
 #repo.showplot(sc,nums)
-
 
 
 '''

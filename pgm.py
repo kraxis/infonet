@@ -1,4 +1,4 @@
-import numpy as np
+from numpy import *
 import math
 import matplotlib.pyplot as plt
 from scipy.linalg import *
@@ -43,7 +43,12 @@ def propscore(loaded,iters):
 
 
 ############################ svm testing ################################
-def svmplot(X,Y):
+def svmplot(sc,nums):
+    X=sc
+    lendata=int(len(sc)/len(nums))
+    Y=zeros(len(sc))
+    for i in range(len(nums)):
+        Y[i*lendata:(i+1)*lendata]=i
     h = .02  
     C = 1.0 
     svc = svm.SVC(kernel='linear', C=C).fit(X, Y)
@@ -53,8 +58,8 @@ def svmplot(X,Y):
 
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                         np.arange(y_min, y_max, h))
+    xx, yy = meshgrid(arange(x_min, x_max, h),
+                         arange(y_min, y_max, h))
     print 'done'
     titles = ['SVC with linear kernel',
               'SVC with RBF kernel',
@@ -66,7 +71,7 @@ def svmplot(X,Y):
         # Plot the decision boundary. For that, we will assign a color to each
         # point in the mesh [x_min, m_max]x[y_min, y_max].
         pl.subplot(2, 2, i + 1)
-        Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = clf.predict(c_[xx.ravel(), yy.ravel()])
 
         # Put the result into a color plot
         Z = Z.reshape(xx.shape)
